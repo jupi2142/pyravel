@@ -1,0 +1,17 @@
+<?php
+
+namespace Staging;
+
+{% if internal_info.foreign_key_info %}
+
+use App\Annotations\RequiredSeed;
+
+/**
+ * @RequiredSeed({ {%- for f_info in internal_info.foreign_key_info -%}
+    "Staging\{{f_info.model_name}}TableSeeder",
+    {%-endfor -%}})
+ */
+{%- endif %}
+class {{internal_info.model_name}}TableSeeder extends \Test\{{internal_info.model_name}}TableSeeder
+{
+}

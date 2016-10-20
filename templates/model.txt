@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class {{internal_info.model_name}} extends Model
+{
+    protected $guarded = ['id'];
+    protected $table = '{{internal_info.table_name}}';
+    {% for info in internal_info.foreign_key_info %}
+    /**
+     * {{info.model_name}} relation
+     *
+     * @return {{info.model_name}}
+     */
+    public function {{info.relationship}}()
+    {
+        return $this->belongsTo(\App\Models\{{info.model_name}}::class);
+    }
+    {% endfor %}
+
+    {%- for info in external_info %}
+        {%- for f_info in info.foreign_key_info %}
+    /**
+      * {{info.model_name}} relation
+      *
+      * @return {{info.model_name}}
+      */
+    public function {{info.relationship_plural}}()
+    {
+        return $this->hasMany(\App\Models\{{info.model_name}}::class, '{{f_info.foreign_key}}');
+    }
+        {% endfor -%}
+    {%- endfor %}
+}

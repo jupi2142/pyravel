@@ -1,0 +1,24 @@
+{% extends "blade/base.blade.txt" %}
+
+{% block content %}
+    <h1>{{internal_info.relationship_spaced}}</h1>
+
+    {!! Form::open( ['route' => ['{{route_prefix}}.store']] ) !!}
+        {%- for info in internal_info.foreign_key_info %}
+        {!! Form::openGroup('{{info.foreign_key}}') !!}
+            {!! Form::label('{{info.relationship_spaced}}') !!}
+            {!! Form::select('{{info.foreign_key}}', ${{info.relationship_snake_plural}}, null, ['noEmpty'=>true])!!}
+        {!! Form::closeGroup() !!}
+        {% endfor %}
+        
+        {% for column in internal_info.slugless_columns -%}
+        {!! Form::openGroup('name') !!}
+          {!! Form::label('{{column['name'].capitalize()}}') !!}
+          {!! Form::text('{{column['name']}}', null) !!}
+        {!! Form::closeGroup() !!}
+        {% endfor -%}
+
+        {!! Form::submit('Submit') !!}
+        <a href="{% raw %}{{{% endraw %}route('{{route_prefix}}.index'){% raw %}}}{% endraw %}" class="btn btn-warning">Cancel</a>
+    {!! Form::close() !!}
+{% endblock %}

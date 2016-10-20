@@ -1,0 +1,10 @@
+        Route::group(['prefix' => '{{internal_info.plural_slugged}}'], function() {
+            Route::get('', ['as' => '{{route_prefix}}.index', 'uses' => '{{internal_info.model_name}}Controller@index']);
+            Route::get('create', ['as' => '{{route_prefix}}.create', 'uses' => '{{internal_info.model_name}}Controller@create']);
+            Route::post('', ['as' => '{{route_prefix}}.store', 'uses' => '{{internal_info.model_name}}Controller@store']);
+            Route::get('{% raw %}{{% endraw %}{{folder.lower()}}_{{internal_info.singular}}{% raw %}}{% endraw %}', ['as' => '{{route_prefix}}.view', 'uses' => '{{internal_info.model_name}}Controller@show']);
+            Route::get('{% raw %}{{% endraw %}{{folder.lower()}}_{{internal_info.singular}}{% raw %}}{% endraw %}/edit', ['as' => '{{route_prefix}}.edit', 'uses' => '{{internal_info.model_name}}Controller@edit']);
+            Route::put('{% raw %}{{% endraw %}{{folder.lower()}}_{{internal_info.singular}}{% raw %}}{% endraw %}', ['as' => '{{route_prefix}}.update', 'uses' => '{{internal_info.model_name}}Controller@update']);
+            Route::delete('{% raw %}{{% endraw %}{{folder.lower()}}_{{internal_info.singular}}{% raw %}}{% endraw %}', ['as' => '{{route_prefix}}.delete', 'uses' => '{{internal_info.model_name}}Controller@destroy']);
+        });
+

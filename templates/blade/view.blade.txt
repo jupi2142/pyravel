@@ -1,0 +1,20 @@
+@extends("scopes.{{folder.lower()}}")
+
+@section('content')
+    <h1>{{internal_info.relationship_spaced}}</h1>
+    <table class="table table-bordered table-striped table-hover" data-page-length="15">
+        {% for column in internal_info.slugless_columns -%}
+        <tr>
+                <td>{{column['name'].capitalize()}}</td>
+                <td>{% raw %}{{{% endraw %}${{internal_info.singular}}->{{column['name']}}{% raw %}}}{% endraw %}</td>
+        </tr>
+        {% endfor -%}
+        {%- for info in internal_info.foreign_key_info -%}
+        <tr>
+            <td>{{info.relationship_spaced.capitalize()}}</td>
+            <td>{% raw %}{{{% endraw %}${{internal_info.singular}}->{{info.relationship}} ?  ${{internal_info.singular}}->{{info.relationship}}->name : null{% raw %}}}{% endraw %}</td>
+        </tr>
+        {% endfor -%}
+    </table>
+    <a href="{% raw %}{{{% endraw %}route('{{route_prefix}}.edit', ${{internal_info.singular}}->{{identifier}}){% raw %}}}{% endraw %}" class="btn btn-success glyphicon glyphicon-edit"> Edit</a>
+@stop

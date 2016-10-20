@@ -1,0 +1,6 @@
+@extends("scopes.{{folder.lower()}}")
+
+@section('content')
+{% block content %}
+{% endblock %}
+@stop

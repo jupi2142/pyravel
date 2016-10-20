@@ -1,0 +1,14 @@
+
+$factory->define(App\Models\{{internal_info.model_name}}::class, function (Faker\Generator $faker) {
+    {% for f_info in internal_info.foreign_key_info -%}
+    ${{f_info.relationship_snake}} = $faker->randomElement(\App\Models\{{f_info.model_name}}::lists('id')->toArray(), 'id');
+    {% endfor -%}
+    return [
+            {% for column in internal_info.columns -%}
+            '{{column['name']}}' => {{faker_types.get(column['type'], '$faker->word')}},
+            {% endfor -%}
+            {% for f_info in internal_info.foreign_key_info -%}
+            '{{f_info.foreign_key}}' => ${{f_info.relationship_snake}},
+            {% endfor -%}];
+});
+

@@ -1,0 +1,4 @@
+$api->get('{{internal_info.plural}}', '{{internal_info.model_name}}Controller@getAll');
+$api->get('{{internal_info.plural}}/{% raw %}{{% endraw %}{{folder.lower()}}_{{internal_info.singular}}{% raw %}}{% endraw %}', '{{internal_info.model_name}}Controller@getOne');
+//$api->post('{{folder.lower()}}_{{internal_info.plural}}, '{{internal_info.model_name}}Controller@postOne');
+

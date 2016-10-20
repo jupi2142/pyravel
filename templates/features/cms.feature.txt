@@ -1,0 +1,97 @@
+Feature: {{namespace_suffix}} {{internal_info.relationship_spaced}} CMS
+  As a user
+  I want to access and manage {{internal_info.plural}}.
+
+  Scenario: Show list of all {{internal_info.plural.replace('-', ' ').replace('_', ' ')}}
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}"
+    Then the "h3" element should contain "{{internal_info.relationship_spaced_plural}}"
+    And I should see "New" in the "a.btn.btn-success.glyphicon-plus" element
+    {% for column in internal_info.slugless_columns -%}
+    And I should see "{{column['name'].capitalize()}}"
+    {% endfor -%}
+    {%- for info in internal_info.foreign_key_info -%}
+    And I should see "{{info.relationship_spaced.capitalize()}}"
+    {% endfor %}
+
+  Scenario: Show details of a specific {{internal_info.singular}}
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/1"
+    Then the "h1" element should contain "{{internal_info.relationship_spaced}}"
+    And I should see "Edit" in the "a.btn.btn-success" element
+    When I follow "Edit"
+    When I should be on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/1/edit"
+
+
+  Scenario: Fail to view a nonexistent {{internal_info.singular}}
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/999999999"
+    And the response status code should be 404
+
+
+  Scenario: Create new incomplete and then complete {{internal_info.singular}} to submit
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/create"
+    And the "h1" element should contain "{{internal_info.relationship_spaced}}"
+    And I should see {{count_type(internal_info.slugless_columns, 'string')}} "input[type=text]" elements
+    And I should see {{count_type(internal_info.slugless_columns, 'text')}} "textarea" elements
+    When I fill in "{{internal_info.slugless_columns[0]['name']}}" with "Auto-created: {{internal_info.relationship_spaced}}"
+    And I press "Submit"
+    Then I should be on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/create"
+    And I should see {{len(internal_info.slugless_columns)-1}} "#flashbag .alert-danger li" elements
+    {% for column in internal_info.slugless_columns[1:] -%}
+    And I should see "The {{column['name']}} field is required"
+    {% endfor -%}
+    And the "{{internal_info.slugless_columns[0]['name']}}" field should contain "Auto-created: {{internal_info.relationship_spaced}}"
+    Then I fill in the following:
+    {% for column in internal_info.slugless_columns[1:] -%}
+      | {{column['name']}} | Auto-created: Test {{internal_info.singular}} {{column['name']}} |
+    {% endfor -%}
+    {%- for info in internal_info.foreign_key_info -%}
+      | {{info.foreign_key}} | 1 |
+    {% endfor %}
+    And I press "Submit"
+    Then the url should match "/{{folder.lower()}}/{{internal_info.plural_slugged}}"
+
+  Scenario: Start creating new {{internal_info.singular}} and cancel
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/create"
+    And the "h1" element should contain "{{internal_info.relationship_spaced}}"
+    And I should see {{count_type(internal_info.slugless_columns, 'string')}} "input[type=text]" elements
+    And I should see {{count_type(internal_info.slugless_columns, 'text')}} "textarea" elements
+    When I fill in "{{internal_info.slugless_columns[0]['name']}}" with "Auto-created: {{internal_info.relationship_spaced}}"
+    And I follow "Cancel"
+    Then the url should match "/{{folder.lower()}}/{{internal_info.plural_slugged}}"
+
+  Scenario: Edit data of one specific {{internal_info.singular}}
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/1/edit"
+    And I should see {{count_type(internal_info.slugless_columns, 'string')}} "input[type=text]" elements
+    And I should see {{count_type(internal_info.slugless_columns, 'text')}} "textarea" elements
+    {% for column in internal_info.slugless_columns -%}
+    When I fill in "{{column['name']}}" with "Auto-updated: {{internal_info.relationship_spaced}} {{column['name']}}"
+    {% endfor -%}
+    {%- for info in internal_info.foreign_key_info -%}
+    When I fill in "{{info.foreign_key}}" with "1"
+    {% endfor -%}
+    And I press "Submit"
+    Then I should be on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/1"
+
+  Scenario: Start to edit data of one specific {{internal_info.singular}} and cancel
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/1/edit"
+    And I should see {{count_type(internal_info.slugless_columns, 'string')}} "input[type=text]" elements
+    And I should see {{count_type(internal_info.slugless_columns, 'text')}} "textarea" elements
+    {% for column in internal_info.slugless_columns -%}
+    When I fill in "{{column['name']}}" with "Auto-updated: {{internal_info.relationship_spaced}} {{column['name']}}"
+    {% endfor -%}
+    {%- for info in internal_info.foreign_key_info -%}
+    When I fill in "{{info.foreign_key}}" with "1"
+    {% endfor %}
+    And I follow "Cancel"
+    Then I should be on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/1"
+
+  Scenario: Fail to edit an nonexistent {{internal_info.singular}}
+    Given I am logged in as Admin
+    When I am on "/{{folder.lower()}}/{{internal_info.plural_slugged}}/999999999/edit"
+    And the response status code should be 404

@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Api\V1\Controllers\{{namespace_suffix}};
+
+use App\Api\V1\Controllers\Controller;
+use App\Models\Media;
+use App\Models\{{internal_info.model_name}};
+use App\Transformer\V1\{{internal_info.model_name}}Transformer;
+
+
+class {{internal_info.model_name}}Controller extends Controller
+{
+
+    protected function getOne({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        return $this->response()->item(${{internal_info.singular}}, new {{internal_info.model_name}}Transformer());
+    }
+
+    protected function getAll()
+    {
+        ${{internal_info.plural}} = {{internal_info.model_name}}::all();
+        return $this->response()->collection(${{internal_info.plural}}, new {{internal_info.model_name}}Transformer());
+    }
+
+}

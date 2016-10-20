@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Transformer\V1;
+
+use App\Models\{{internal_info.model_name}};
+{%- for f_info in internal_info.foreign_key_info %}
+use App\Models\{{f_info.model_name}};
+{%- endfor %}
+{%- for f_info in internal_info.foreign_key_info %}
+use App\Transformer\V1\{{f_info.model_name}}Transformer;
+{%- endfor %}
+{%- for info in external_info %}
+use App\Transformer\V1\{{info.model_name}}Transformer;
+{%- endfor %}
+use League\Fractal;
+
+class {{internal_info.model_name}}Transformer extends Fractal\TransformerAbstract
+{
+    /**
+     * List of resources possible to include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [
+        {% for relationship in internal_info.relationships -%}
+        '{{relationship}}',
+        {% endfor -%}
+    ];
+
+    public function transform({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        return [
+            {% for column in internal_info.columns -%}
+            '{{column['name']}}' => ${{internal_info.singular}}->{{column['name']}},
+            {% endfor -%}];
+    }
+    {% for f_info in internal_info.foreign_key_info %}
+    public function include{{f_info.relationship_cap}}({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        ${{f_info.relationship_snake}} = ${{internal_info.singular}}->{{f_info.relationship}};
+        if(${{f_info.relationship_snake}})
+            return $this->item(${{f_info.relationship_snake}}, new {{f_info.model_name}}Transformer());
+    }
+    {% endfor %}
+
+    {%- for info in external_info %}
+        {% for f_info in info.foreign_key_info %}
+    public function include{{info.relationship_cap_plural}}({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        ${{info.plural}} = ${{internal_info.singular}}->{{info.plural}};
+        return $this->collection(${{info.plural}}, new {{info.model_name}}Transformer());
+    }
+        {% endfor %}
+    {% endfor %}
+}

@@ -1,0 +1,20 @@
+<?php
+
+namespace Test;
+
+{% if internal_info.foreign_key_info -%}
+
+use App\Annotations\RequiredSeed;
+
+/**
+ * @RequiredSeed({ {%- for f_info in internal_info.foreign_key_info -%}
+    "Test\{{f_info.model_name}}TableSeeder",
+    {%- endfor -%}})
+ */
+{%- endif %}
+class {{internal_info.model_name}}TableSeeder extends \DatabaseSeeder
+{
+    public function run(){
+        //factory(\App\Models\{{internal_info.model_name}}::class, 5)->create();
+    }
+}

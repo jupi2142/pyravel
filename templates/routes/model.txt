@@ -1,0 +1,2 @@
+        $router->model('{{folder.lower()}}_{{internal_info.singular}}', \App\Models\{{internal_info.model_name}}::class);
+

@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Http\Controllers\{{namespace_suffix}};
+
+use Illuminate\Http\Request;
+
+use App\Http\Requests;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\{{namespace_suffix}}\{{internal_info.model_name}}Request;
+use App\Models\{{internal_info.model_name}};
+{%- for info in internal_info.foreign_key_info %}
+use App\Models\{{info.model_name}};
+{%- endfor %}
+
+class {{internal_info.model_name}}Controller extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        ${{internal_info.plural}} = {{internal_info.model_name}}::all();
+        return view('{{views_dotpath}}.index', compact('{{internal_info.plural}}'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        {%- for info in internal_info.foreign_key_info %}
+        ${{info.relationship_snake_plural}} = {{info.model_name}}::lists('name', 'id');
+        {%- endfor %}
+        return view('{{views_dotpath}}.create_or_edit', compact([{%- for info in internal_info.foreign_key_info -%}
+        '{{info.relationship_snake_plural}}',
+        {%- endfor -%}]));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  App\Http\Requests\{{namespace_suffix}}\{{internal_info.model_name}}Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store({{internal_info.model_name}}Request $request)
+    {
+        try {
+            ${{internal_info.singular}} = {{internal_info.model_name}}::create($request->all());
+            \Notification::success('Data added successfully');
+        } catch (QueryException $e) {
+            \Notification::success('Data was not added successfully' . ': ' . $e->getMessage());
+        }
+        return redirect()->route('{{route_prefix}}.index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\{{internal_info.model_name}} ${{internal_info.singular}}
+     * @return \Illuminate\Http\Response
+     */
+    public function show({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        return view('{{views_dotpath}}.view', compact('{{internal_info.singular}}'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  {{internal_info.model_name}} ${{internal_info.singular}}
+     * @return \Illuminate\Http\Response
+     */
+    public function edit({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        {%- for info in internal_info.foreign_key_info %}
+        ${{info.relationship_snake_plural}} = {{info.model_name}}::lists('name', 'id');
+        {%- endfor %}
+        return view('{{views_dotpath}}.create_or_edit', compact(['{{internal_info.singular}}', {%- for info in internal_info.foreign_key_info -%}
+        '{{info.relationship_snake_plural}}',
+        {%- endfor -%}]));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  App\Http\Requests\{{namespace_suffix}}\{{internal_info.model_name}}Request $request
+     * @param  \App\Models\{{internal_info.model_name}} ${{internal_info.singular}}
+     * @return \Illuminate\Http\Response
+     */
+    public function update({{internal_info.model_name}}Request $request, {{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        try {
+            ${{internal_info.singular}}->update($request->all());
+            \Notification::success("Data successfully updated");
+        } catch (QueryException $e) {
+            \Notification::success('Data was not updated successfully' . ': ' . $e->getMessage());
+        }
+        return redirect()->route('{{route_prefix}}.view', ['{{internal_info.singular}}' => ${{internal_info.singular}}->{{identifier}}]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\{{internal_info.model_name}} ${{internal_info.singular}}
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy({{internal_info.model_name}} ${{internal_info.singular}})
+    {
+        ${{internal_info.singular}}->delete();
+        \Notification::success("Data successfully deleted");
+        return redirect()->route('{{route_prefix}}.index');
+    }
+}
